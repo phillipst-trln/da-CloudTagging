@@ -1,2 +1,3 @@
 DeploySQLManagedInstance.ps1
 TfGM-AzFunctions.psm1
+TagExclusions

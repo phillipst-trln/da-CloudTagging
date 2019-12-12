@@ -29,15 +29,18 @@ foreach ($sub in $subs)
     $rgs = Get-AzResourceGroup
     foreach ($rg in $rgs)
     {
-        if ($rg.ResourceGroupName -eq "Default-SQL-NorthEurope")
+            #Write-Host $rg.ResourceGroupName"=================="
+        foreach ($resource in (Get-AzResource -ResourceGroupName $rg.ResourceGroupName))
         {
-            Write-Host $rg.ResourceGroupName"=================="
-            Get-AzResource -ResourceGroupName $rg.ResourceGroupName -TagName "Project" | SELECT Name, ResourceType, Tags | Format-Table
-            break;
+            if ($resource.Tags -eq $null)
+            {
+                #Get-AzResource -ResourceGroupName $rg.ResourceGroupName -TagName "Project" | SELECT Name, ResourceType, Tags | Format-Table
+                write-host $rg.ResourceGroupName, $resource.Name, $resource.ResourceType
+            }
         }
+        Write-Host "`r`n"          
     }
-    if ($i -eq 1){break;}
-    $i=$i+1
 }
+#if ($i -eq 1){break;}
+    #$i=$i+1
 
-#(Find-AzureRmResource -ResourceGroupNameEquals $resourceGroupName -ResourceNameEquals $resourceName).Tags
