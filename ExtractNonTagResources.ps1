@@ -24,6 +24,10 @@ Import-Module -Name ((Get-Item -Path ".\").FullName+"\Tagging.psm1") | out-null
 $exclusionsDirPath = (Get-Item -Path ".\").FullName+"\TagExclusions\resource-capabilities\"
 $exclusionsFileName = "\tag-support.csv"
 $exclusionsFilePath = $exclusionsDirPath+$exclusionsFileName
+$of = (Get-Item -Path ".\").FullName+"\results.txt"
+
+if (Test-Path $of){Remove-Item $of}
+("Subscription`tResourceGroup`tResource`tResourceType") | Out-File $of -Append
 
 # Shouldnt need this
 #Connect-AzAccount;
@@ -34,8 +38,10 @@ $exclusionsFilePath = $exclusionsDirPath+$exclusionsFileName
 # Return array of resources to be excluded.
 $exclusions = getTagAllowed $exclusionsFilePath
 
+<#
 $Subscription="TfGM EDW"
 $ResourceGroupName='SQL-ManagedInstance-02-RG'
+#>
 
 # Shouldnt need this
 #Connect-AzAccount;
@@ -48,40 +54,30 @@ $tags = @{"Environment"=""; "Dept"=""}
 
 foreach ($sub in $subs)
 {
-    #if ($sub.Name -eq $Subscription)
-    #{
-        Write-Host "............................."
-        write-host $sub.Name
-        
-        Select-AzSubscription -Subscription $sub | Out-Null
-        $rgs = Get-AzResourceGroup
-        foreach ($rg in $rgs)
-        {
-            $taggedResources = getResourcesWithTags $tags $rg.ResourceGroupName
 
-            foreach ($resource in (Get-AzResource -ResourceGroupName $rg.ResourceGroupName))
-            {
-                #write-host $resource.ResourceType
-                # if the resource is relevant and doesnt contain a tag
-                if ($exclusions.contains($resource.ResourceType) -and (!($taggedResources.contains($resource.ResourceId))))
-                {
-                    #if ($resource.Tags -ne $null)
-                    #{
-                    #    foreach ($t in $resource.Tags.Keys)
-                    #    {
-                    #        write-host $t
-                    #    }
-                        #Get-AzResource -ResourceGroupName $rg.ResourceGroupName -TagName "Project" | SELECT Name, ResourceType, Tags | Format-Table
-                        write-host $sub.Name"`t"$rg.ResourceGroupName"`t"$resource.Name"`t"$resource.ResourceType"`t"$resource.Tags
-                        #Set-AzResource -Tag @{ "Dept"="IT"; "Environment"="Test" } -ResourceId $resource.ResourceId -Force
-                    #}
-
-                }
-            }
-            #}
-            
-        }
-        break
-    #}
+    Write-Host "............................."
+    write-host $sub.Name
     
+    Select-AzSubscription -Subscription $sub | Out-Null
+    $rgs = Get-AzResourceGroup
+    foreach ($rg in $rgs)
+    {
+        write-host " > "$rg.ResourceGroupName
+        $taggedResources = getResourcesWithTags $tags $rg.ResourceGroupName
+
+        foreach ($resource in (Get-AzResource -ResourceGroupName $rg.ResourceGroupName))
+        {
+            #write-host $resource.ResourceType
+            # if the resource is relevant and doesnt contain a tag
+            if ($exclusions.contains($resource.ResourceType) -and (!($taggedResources.contains($resource.ResourceId))))
+            {
+                    #write-host $sub.Name"`t"$rg.ResourceGroupName"`t"$resource.Name"`t"$resource.ResourceType"`t"$resource.Tags
+                    ($sub.Name+"`t"+$rg.ResourceGroupName+"`t"+$resource.Name+"`t"+$resource.ResourceType) | Out-File $of -Append
+                    #Set-AzResource -Tag @{ "Dept"="IT"; "Environment"="Test" } -ResourceId $resource.ResourceId -Force
+            }
+        }
+    }
+    $i=$i+1
+    #if ($i -eq 2)
+    #{break}
 }
