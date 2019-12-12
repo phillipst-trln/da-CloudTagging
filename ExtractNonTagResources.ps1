@@ -1,47 +1,87 @@
+<#
+    https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-using-tags
 
-function pullExclusions($fullPath)
-{
-    $cl = (Get-Item -Path ".\").FullName
-    Set-Location $fullPath
-    git pull
-    Set-Location $cl
-}
+#>
 
-function getTagExclusions($exclusion_file_path)
-{
+# Check Az module
 
-    if (!(Test-Path $exclusion_file_path))
-    {
-        Write-Host "File doesnt exist"
-        exit
-    }
-    
-    $exclusions = Import-Csv $exclusion_file_path
-    $cantTag = @()
-    
-    $i = 0
-    
-    foreach ($line in $exclusions)
-    {
-        if($line.("supportsTags") -eq "FALSE")
-        {
-            $cantTag += $line.("providerName")+"/"+$line.("resourceType")
-        }
-        #Write-Host $line.("providerName") $line.("resourceType") $line.("supportsTags") #$line.("costReport")
-        $i = $i+1
-        if ($i -eq 10){break}
-    }
-    
-    return $cantTag
+$AzModuleVersion = "2.0.0"
 
-}
+if (!(Get-InstalledModule -Name Az -MinimumVersion $AzModuleVersion -ErrorAction SilentlyContinue)) {
+    Write-Host "This script requires to have Az Module version $AzModuleVersion installed..
+It was not found, please install from: https://docs.microsoft.com/en-us/powershell/azure/install-az-ps"
+    exit
+} 
 
+
+# Remove and re-add module if applicable:
+$fnName = 'Tagging'
+if(get-Module | Where-Object {$_.name -eq $fnName}){Remove-Module -Name $fnName}
+Import-Module -Name ((Get-Item -Path ".\").FullName+"\Tagging.psm1") | out-null
+
+
+# Set up working directories and files
 $exclusionsDirPath = (Get-Item -Path ".\").FullName+"\TagExclusions\resource-capabilities\"
 $exclusionsFileName = "\tag-support.csv"
 $exclusionsFilePath = $exclusionsDirPath+$exclusionsFileName
 
+# Shouldnt need this
+#Connect-AzAccount;
+
 # Get latest exclusion file from Git Hub 
-pullExclusions $exclusionsDirPath
+#pullExclusions $exclusionsDirPath
 
 # Return array of resources to be excluded.
-getTagExclusions $exclusionsFilePath
+$exclusions = getTagAllowed $exclusionsFilePath
+
+$Subscription="TfGM EDW"
+$ResourceGroupName='SQL-ManagedInstance-02-RG'
+
+# Shouldnt need this
+#Connect-AzAccount;
+
+$subs = Get-AzSubscription
+$i = 0
+$taggedResources = @()
+$tags = @{"Environment"=""; "Dept"=""}
+
+
+foreach ($sub in $subs)
+{
+    #if ($sub.Name -eq $Subscription)
+    #{
+        Write-Host "............................."
+        write-host $sub.Name
+        
+        Select-AzSubscription -Subscription $sub | Out-Null
+        $rgs = Get-AzResourceGroup
+        foreach ($rg in $rgs)
+        {
+            $taggedResources = getResourcesWithTags $tags $rg.ResourceGroupName
+
+            foreach ($resource in (Get-AzResource -ResourceGroupName $rg.ResourceGroupName))
+            {
+                #write-host $resource.ResourceType
+                # if the resource is relevant and doesnt contain a tag
+                if ($exclusions.contains($resource.ResourceType) -and (!($taggedResources.contains($resource.ResourceId))))
+                {
+                    #if ($resource.Tags -ne $null)
+                    #{
+                    #    foreach ($t in $resource.Tags.Keys)
+                    #    {
+                    #        write-host $t
+                    #    }
+                        #Get-AzResource -ResourceGroupName $rg.ResourceGroupName -TagName "Project" | SELECT Name, ResourceType, Tags | Format-Table
+                        write-host $sub.Name"`t"$rg.ResourceGroupName"`t"$resource.Name"`t"$resource.ResourceType"`t"$resource.Tags
+                        #Set-AzResource -Tag @{ "Dept"="IT"; "Environment"="Test" } -ResourceId $resource.ResourceId -Force
+                    #}
+
+                }
+            }
+            #}
+            
+        }
+        break
+    #}
+    
+}
