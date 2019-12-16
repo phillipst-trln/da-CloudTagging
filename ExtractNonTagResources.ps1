@@ -24,10 +24,10 @@ Import-Module -Name ((Get-Item -Path ".\").FullName+"\Tagging.psm1") | out-null
 $exclusionsDirPath = (Get-Item -Path ".\").FullName+"\TagExclusions\resource-capabilities\"
 $exclusionsFileName = "\tag-support.csv"
 $exclusionsFilePath = $exclusionsDirPath+$exclusionsFileName
-$of = (Get-Item -Path ".\").FullName+"\results.txt"
+$of = (Get-Item -Path ".\").FullName+"\results.csv"
 
 if (Test-Path $of){Remove-Item $of}
-("Subscription`tResourceGroup`tResource`tResourceType") | Out-File $of -Append
+("ResourceId,Subscription,ResourceGroup,Resource,ResourceType,Tags") | Out-File $of -Append
 
 # Shouldnt need this
 #Connect-AzAccount;
@@ -67,14 +67,17 @@ foreach ($sub in $subs)
 
         foreach ($resource in (Get-AzResource -ResourceGroupName $rg.ResourceGroupName))
         {
-            #write-host $resource.ResourceType
+
             # if the resource is relevant and doesnt contain a tag
             if ($exclusions.contains($resource.ResourceType) -and (!($taggedResources.contains($resource.ResourceId))))
             {
-                    #write-host $sub.Name"`t"$rg.ResourceGroupName"`t"$resource.Name"`t"$resource.ResourceType"`t"$resource.Tags
-                    ($sub.Name+"`t"+$rg.ResourceGroupName+"`t"+$resource.Name+"`t"+$resource.ResourceType) | Out-File $of -Append
+                    $tagStr = convertHTtoString $resource.Tags
+                    ($resource.ResourceId+","+$sub.Name+","+
+                    $rg.ResourceGroupName+","+$resource.Name+
+                    ","+$resource.ResourceType+","+$tagStr) | Out-File $of -Append
                     #Set-AzResource -Tag @{ "Dept"="IT"; "Environment"="Test" } -ResourceId $resource.ResourceId -Force
             }
+
         }
     }
     $i=$i+1
