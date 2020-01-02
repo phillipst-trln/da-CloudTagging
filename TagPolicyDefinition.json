@@ -1,0 +1,21 @@
+{
+    "if": {
+        "anyOf": [{
+            "field": "[concat('tags[Environment]')]",
+            "exists": "false"
+        },
+        {
+            "field": "[concat('tags[Project]')]",
+            "exists": "false"
+        },
+        {
+            "field": "[concat('tags[Environment]')]",
+            "notIn": "[parameters('allowedEnvironments')]"
+        }               
+    ]
+
+    },
+    "then": {
+      "effect": "deny"
+    }
+}

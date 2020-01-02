@@ -126,8 +126,9 @@ function amalgamateLists{
 
 function isValueInKeyList
 {
-    param([Hastable]$ht, $v)
+    param([Hashtable]$ht, $v)
     $res = $false
+    
     foreach($k in $ht.Keys)
     {
         if ($k -eq $v)
@@ -136,5 +137,6 @@ function isValueInKeyList
             break
         }
     }
+    
     return $res
 }

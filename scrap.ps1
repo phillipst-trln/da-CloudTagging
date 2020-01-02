@@ -1,21 +1,4 @@
-# Remove and re-add module if applicable:
-$fnName = 'Tagging'
-if(get-Module | Where-Object {$_.name -eq $fnName}){Remove-Module -Name $fnName}
-Import-Module -Name ((Get-Item -Path ".\").FullName+"\Tagging.psm1") | out-null
 
+$r = "/subscriptions/f83a3c88-958b-43d0-b567-40e8d0826aa7/resourceGroups/tfgm-travel-planner-test/providers/Microsoft.Web/sites/tfgm-travel-planner-test"
 
-#$Subscription="TfGM EDW"
-$Subscription="Open Data Project Live"
-#$ResourceGroupName='SQL-ManagedInstance-02-RG'
-$ResourceGroupName = "Api-Default-North-Europe"
-
-
-#$tags1 = @{"Environment"=""; "Dept"=""}
-$tags1 = @{"Environment"=""; "Project"=""}
-
-Select-AzSubscription -Subscription $Subscription | Out-Null
-$t = getResourcesWithTags $tags1 $ResourceGroupName
-
-$t
-
-
+Get-AzResource -ResourceId $r

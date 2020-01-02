@@ -38,15 +38,15 @@ if (Test-Path $of){Remove-Item $of}
 # Return array of resources to be excluded.
 $exclusions = getTagAllowed $exclusionsFilePath
 
-<#
-$Subscription="TfGM EDW"
-$ResourceGroupName='SQL-ManagedInstance-02-RG'
-#>
+
+$subname="Open Data Project Test"
+$ResourceGroupName="CS-WebJobs-NorthEurope-scheduler"
+
 
 # Shouldnt need this
 #Connect-AzAccount;
 
-$subs = Get-AzSubscription
+$subs = Get-AzSubscription -SubscriptionName $subname
 $i = 0
 $taggedResources = @()
 $tags = @{"Environment"=""; "Dept"=""}
