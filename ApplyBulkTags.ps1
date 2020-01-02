@@ -15,12 +15,12 @@ Import-Module -Name ((Get-Item -Path ".\").FullName+"\Tagging.psm1") | out-null
 
 #Connect-AzAccount;
 
-# Resource group and subscription
-$subname="Jason Test"
+# Resource group and subscription if required
+#$subname="Jason Test"
 #$ResourceGroupName="CS-WebJobs-NorthEurope-scheduler"
 
 # Input file in format [ResourceId, Environment, Project]
-$inputFile="C:\DevArea\da-CloudTagging\TagsToAdd_EDW.csv"
+$inputFile="C:\DevArea\da-CloudTagging\TagsToAdd_AdHoc.csv"
 
 if (!(Test-Path $inputFile)){
     throw "$inputFile does not exist."
@@ -36,9 +36,7 @@ $resrouces = Import-Csv -Path $inputFile
 foreach ($resrouce in $resrouces)
 {
     $r = $resrouce.ResourceId
-    #write-host $r
-    write-host $resourceObj.Name
-    write-host $resourceObj.Tags
+    write-host "$i > $r"
 
     $resourceObj = Get-AzResource -ResourceId $r
     $tags = $resourceObj.Tags
@@ -49,6 +47,7 @@ foreach ($resrouce in $resrouces)
     # Sort Environment Tag
     if ($tags["Environment"])
     {
+        write-host "Old Environment Tag >" $tags["Environment"]" Overwriting..."
         $tags["Environment"] = $resrouce.Environment
     }
     else
@@ -59,6 +58,7 @@ foreach ($resrouce in $resrouces)
     # Sort project tag
     if ($tags["Project"])
     {
+        write-host "Old Project Tag >" $tags["Project"]" Overwriting..."
         $tags["Project"] = $resrouce.Project
     }
     else 
@@ -71,16 +71,8 @@ foreach ($resrouce in $resrouces)
         -Tag $tags `
         -Force | Out-Null
 
-    # Write-Host $r #esrouce.ResourceId # " > " $resrouce.Environment " > " $resrouce.Project
-    
-    <#
-    if ($resourceObj.Tags)
-    {
-        write-host $resourceObj.Name
-        write-host $resourceObj.Tags
-    } # $resrouce.ResourceId
-    #>    
     $i = $i+1
+    #break
     #if ($i -eq 10){break}
 }
 

@@ -24,7 +24,8 @@ Import-Module -Name ((Get-Item -Path ".\").FullName+"\Tagging.psm1") | out-null
 $exclusionsDirPath = (Get-Item -Path ".\").FullName+"\TagExclusions\resource-capabilities\"
 $exclusionsFileName = "\tag-support.csv"
 $exclusionsFilePath = $exclusionsDirPath+$exclusionsFileName
-$of = (Get-Item -Path ".\").FullName+"\results.csv"
+$of = (Get-Item -Path ".\").FullName+"\results_$(get-date -format yyMMdd-HHmmssff).csv"
+# $(get-date -format yyMMdd-HHmmssff)
 
 if (Test-Path $of){Remove-Item $of}
 ("ResourceId,Subscription,ResourceGroup,Resource,ResourceType,Tags") | Out-File $of -Append
@@ -33,12 +34,13 @@ if (Test-Path $of){Remove-Item $of}
 #Connect-AzAccount;
 
 # Get latest exclusion file from Git Hub 
-#pullExclusions $exclusionsDirPath
+# pullExclusions $exclusionsDirPath
 
 # Return array of resources to be excluded.
 $exclusions = getTagAllowed $exclusionsFilePath
 
 
+# Only required for granularity
 $subname="Open Data Project Test"
 $ResourceGroupName="CS-WebJobs-NorthEurope-scheduler"
 
@@ -46,10 +48,11 @@ $ResourceGroupName="CS-WebJobs-NorthEurope-scheduler"
 # Shouldnt need this
 #Connect-AzAccount;
 
-$subs = Get-AzSubscription -SubscriptionName $subname
+$subs = Get-AzSubscription # -SubscriptionName $subname
 $i = 0
 $taggedResources = @()
-$tags = @{"Environment"=""; "Dept"=""}
+# Relevant tags
+$tags = @{"Environment"=""; "Project"=""}
 
 
 foreach ($sub in $subs)
@@ -75,7 +78,6 @@ foreach ($sub in $subs)
                     ($resource.ResourceId+","+$sub.Name+","+
                     $rg.ResourceGroupName+","+$resource.Name+
                     ","+$resource.ResourceType+","+$tagStr) | Out-File $of -Append
-                    #Set-AzResource -Tag @{ "Dept"="IT"; "Environment"="Test" } -ResourceId $resource.ResourceId -Force
             }
 
         }

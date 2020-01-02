@@ -11,7 +11,11 @@
         {
             "field": "[concat('tags[Environment]')]",
             "notIn": "[parameters('allowedEnvironments')]"
-        }               
+        },
+        {
+            "field": "[concat('tags[Project]')]",
+            "equals": ""
+        }
     ]
 
     },

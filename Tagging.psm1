@@ -37,7 +37,7 @@ function getTagAllowed($exclusion_file_path)
         {
             $canTag += $line.("providerName")+"/"+$line.("resourceType")
         }
-        #Write-Host $line.("providerName") $line.("resourceType") $line.("supportsTags") #$line.("costReport")
+
         $i = $i+1
         #if ($i -eq 10){break}
     }
@@ -51,7 +51,6 @@ function getResourcesWithTags{
     $r = @()
     $s = @()
     
-    #$r = (Get-AzResource -Tag $tags -ResourceGroupName $rg).ResourceId
     $r = Get-AzResource -Tag $tags -ResourceGroupName $rg
 
     # Loop over resources in resource group
@@ -66,14 +65,12 @@ function getResourcesWithTags{
                 # If tags contain uppercase chars, mark flag as false
                 if ($res.Tags[$t] -cmatch "[A-Z]")
                 {
-                    #write-host "Got to case check"
                     $add = $false
                     break
                 }
                 # if environment tag is not valid from environments array
                 if ($t -eq "Environment" -and (!($Environments.Contains($res.Tags[$t]))))
                 {
-                    #write-host "Got to value check"
                     $add = $false
                     break                
                 }
@@ -84,7 +81,6 @@ function getResourcesWithTags{
     }
     
     # Handle null array
-    #if ($s -eq $null -or $s )
     if ($s.count -eq 0)
     {
         $s += "null"

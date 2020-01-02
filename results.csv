@@ -1,6 +1,0 @@
-ResourceId,Subscription,ResourceGroup,Resource,ResourceType,Tags
-/subscriptions/5973de0f-c552-4247-99e6-b0a6a1ecfc2a/resourceGroups/Default-ServiceBus-NorthEurope/providers/Microsoft.ServiceBus/namespaces/testtfgm,Open Data Project Test,Default-ServiceBus-NorthEurope,testtfgm,Microsoft.ServiceBus/namespaces,
-/subscriptions/5973de0f-c552-4247-99e6-b0a6a1ecfc2a/resourceGroups/Default-Web-NorthEurope/providers/Microsoft.Web/serverFarms/Default0,Open Data Project Test,Default-Web-NorthEurope,Default0,Microsoft.Web/serverFarms,
-/subscriptions/5973de0f-c552-4247-99e6-b0a6a1ecfc2a/resourceGroups/Default-Web-NorthEurope/providers/Microsoft.Web/sites/tfgmdatatest,Open Data Project Test,Default-Web-NorthEurope,tfgmdatatest,Microsoft.Web/sites,
-/subscriptions/5973de0f-c552-4247-99e6-b0a6a1ecfc2a/resourceGroups/Default-Web-NorthEurope/providers/Microsoft.Web/sites/tfgmtestadmin,Open Data Project Test,Default-Web-NorthEurope,tfgmtestadmin,Microsoft.Web/sites,
-/subscriptions/5973de0f-c552-4247-99e6-b0a6a1ecfc2a/resourceGroups/Default-Web-NorthEurope/providers/Microsoft.Web/sites/tfgmtestdev,Open Data Project Test,Default-Web-NorthEurope,tfgmtestdev,Microsoft.Web/sites,

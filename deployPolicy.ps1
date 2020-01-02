@@ -2,7 +2,7 @@
 # Get a reference to the resource group that will be the scope of the assignment
 $sub = "TfGM EDW"
 Select-AzSubscription -Subscription $sub | Out-Null
-$Subscription = Get-AzSubscription -Name $sub
+$Subscription = Get-AzSubscription -SubscriptionName $sub
 $rg = Get-AzResourceGroup -Name 'TestVM2'
 
 # Get a reference to the built-in policy definition that will be assigned
@@ -11,9 +11,9 @@ $definition = "C:\DevArea\da-CloudTagging\TagPolicyDefinition.json"
 $params = "C:\DevArea\da-CloudTagging\TagPolicyParams.json"
 
 # Create the policy assignment with the built-in definition against your resource group
-$pName = 'Enforce TfGM Tagging test'
-$dName = 'Enforce TfGM Tagging test'
-$dep = $false
+$pName = 'TfGM default tagging policy'
+$dName = 'TfGM default tagging policy'
+$dep = $true
 
 if ($dep)
 {
@@ -30,7 +30,7 @@ if ($dep)
     #-Scope "/subscriptions/$($Subscription.Id)"
     New-AzPolicyAssignment -Name $pName `
         -DisplayName $dName `
-        -Scope $rg.ResourceId `
+        -Scope "/subscriptions/$($Subscription.Id)" `
         -PolicyDefinition $Policy `
         -PolicyParameter $policyParams
 
