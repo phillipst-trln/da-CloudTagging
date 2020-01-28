@@ -20,7 +20,7 @@ Import-Module -Name ((Get-Item -Path ".\").FullName+"\Tagging.psm1") | out-null
 #$ResourceGroupName="CS-WebJobs-NorthEurope-scheduler"
 
 # Input file in format [ResourceId, Environment, Project]
-$inputFile="C:\DevArea\da-CloudTagging\TagsToAdd_AdHoc.csv"
+$inputFile="C:\DevArea\da-CloudTagging\webdevs2_23012020.csv"
 
 if (!(Test-Path $inputFile)){
     throw "$inputFile does not exist."

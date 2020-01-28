@@ -25,6 +25,7 @@ $exclusionsDirPath = (Get-Item -Path ".\").FullName+"\TagExclusions\resource-cap
 $exclusionsFileName = "\tag-support.csv"
 $exclusionsFilePath = $exclusionsDirPath+$exclusionsFileName
 $of = (Get-Item -Path ".\").FullName+"\results_$(get-date -format yyMMdd-HHmmssff).csv"
+write-host $of
 # $(get-date -format yyMMdd-HHmmssff)
 
 if (Test-Path $of){Remove-Item $of}
@@ -36,19 +37,19 @@ if (Test-Path $of){Remove-Item $of}
 # Get latest exclusion file from Git Hub 
 # pullExclusions $exclusionsDirPath
 
-# Return array of resources to be excluded.
+# Return array of resources to !not! be excluded.
 $exclusions = getTagAllowed $exclusionsFilePath
 
 
 # Only required for granularity
-$subname="Open Data Project Test"
+$subname="TfGM Geospatia"
 $ResourceGroupName="CS-WebJobs-NorthEurope-scheduler"
 
 
 # Shouldnt need this
 #Connect-AzAccount;
 
-$subs = Get-AzSubscription # -SubscriptionName $subname
+$subs = Get-AzSubscription #-SubscriptionName $subname
 $i = 0
 $taggedResources = @()
 # Relevant tags
@@ -63,6 +64,8 @@ foreach ($sub in $subs)
     
     Select-AzSubscription -Subscription $sub | Out-Null
     $rgs = Get-AzResourceGroup
+
+    # Loop over resource groups
     foreach ($rg in $rgs)
     {
         write-host " > "$rg.ResourceGroupName
@@ -74,15 +77,15 @@ foreach ($sub in $subs)
             # if the resource is relevant and doesnt contain a tag
             if ($exclusions.contains($resource.ResourceType) -and (!($taggedResources.contains($resource.ResourceId))))
             {
-                    $tagStr = convertHTtoString $resource.Tags
-                    ($resource.ResourceId+","+$sub.Name+","+
-                    $rg.ResourceGroupName+","+$resource.Name+
-                    ","+$resource.ResourceType+","+$tagStr) | Out-File $of -Append
+                $tagStr = convertHTtoString $resource.Tags
+                ($resource.ResourceId+","+$sub.Name+","+
+                $rg.ResourceGroupName+","+$resource.Name+
+                ","+$resource.ResourceType+","+$tagStr) | Out-File $of -Append
             }
 
         }
     }
     $i=$i+1
-    #if ($i -eq 2)
+    #if ($i -eq 3)
     #{break}
 }

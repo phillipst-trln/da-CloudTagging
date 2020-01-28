@@ -63,11 +63,14 @@ function getResourcesWithTags{
             if (isValueInKeyList $tags $t)
             {
                 # If tags contain uppercase chars, mark flag as false
+                <#
                 if ($res.Tags[$t] -cmatch "[A-Z]")
                 {
                     $add = $false
                     break
                 }
+                #>
+                
                 # if environment tag is not valid from environments array
                 if ($t -eq "Environment" -and (!($Environments.Contains($res.Tags[$t]))))
                 {
