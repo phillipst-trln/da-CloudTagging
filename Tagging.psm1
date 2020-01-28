@@ -105,6 +105,13 @@ function convertHTtoString
     return $ret
 }
 
+function getTagValue
+{
+    param([Hashtable]$tags, $tagKey)
+
+    return $tags[$tagKey]
+
+}
 
 function amalgamateLists{
     param([list]$tag1, [list]$tag2)

@@ -49,7 +49,7 @@ $ResourceGroupName="CS-WebJobs-NorthEurope-scheduler"
 # Shouldnt need this
 #Connect-AzAccount;
 
-$subs = Get-AzSubscription -SubscriptionName $subname
+$subs = Get-AzSubscription #-SubscriptionName $subname
 $i = 0
 $taggedResources = @()
 # Relevant tags
@@ -74,7 +74,7 @@ foreach ($sub in $subs)
         #foreach ($resource in $r)
         #{
         #    $resource
-        $tagStr = convertHTtoString $resource.Tags
+        $tagStr = getTagValue $resource.Tags "Project" #convertHTtoString $resource.Tags
         ($resource.ResourceId+","+$sub.Name+","+
         $rg.ResourceGroupName+","+$resource.Name+
         ","+$resource.ResourceType+","+$tagStr) | Out-File $of -Append
